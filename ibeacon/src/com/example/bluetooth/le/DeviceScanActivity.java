@@ -17,54 +17,72 @@
 package com.example.bluetooth.le;
 
 import android.app.Activity;
-import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
-
+import android.os.Message;
+import android.text.TextUtils;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import com.example.bluetooth.le.iBeaconClass.iBeacon;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Activity for scanning and displaying available Bluetooth LE devices.
  */
-public class DeviceScanActivity extends ListActivity {
-	private final static String TAG = DeviceScanActivity.class.getSimpleName();
-	private final static String UUID_KEY_DATA = "0000ffe1-0000-1000-8000-00805f9b34fb";
-
-    private LeDeviceListAdapter mLeDeviceListAdapter;
-    /**搜索BLE终端*/
+public class DeviceScanActivity extends Activity {
+    private final static String TAG = DeviceScanActivity.class.getSimpleName();
+    private final static String UUID_KEY_DATA = "0000ffe1-0000-1000-8000-00805f9b34fb";
+    public static final int REQUEST_ENABLE_BT = 1001;
+    @Bind(R.id.tv_left)
+    TextView tvLeft;
+    @Bind(R.id.iv_rssi_near)
+    ImageView ivRssiNear;
+    @Bind(R.id.iv_rssi_nearer)
+    ImageView ivRssiNearer;
+    @Bind(R.id.iv_rssi_nearest)
+    ImageView ivRssiNearest;
+    @Bind(R.id.tv_rssi_status)
+    TextView tvRssiStatus;
+    @Bind(R.id.iv_rssi_status)
+    ImageView ivRssiStatus;
+    @Bind(R.id.tv_uuid)
+    TextView tvUuid;
+    @Bind(R.id.tv_major)
+    TextView tvMajor;
+    @Bind(R.id.tv_minor)
+    TextView tvMinor;
+    @Bind(R.id.tv_rssi)
+    TextView tvRssi;
+    @Bind(R.id.tv_mac)
+    TextView tvMac;
+    /**
+     * 搜索BLE终端
+     */
     private BluetoothAdapter mBluetoothAdapter;
-
-    private boolean mScanning;
-    private Handler mHandler;
-
-    // Stops scanning after 10 seconds.
-    private static final long SCAN_PERIOD = 60000;
+    private boolean isReset;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActionBar().setTitle(R.string.title_devices);
-        mHandler = new Handler();
-
+        setContentView(R.layout.main_layout);
+        ButterKnife.bind(this);
         // Use this check to determine whether BLE is supported on the device.  Then you can
         // selectively disable BLE-related features.
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
             finish();
+            return;
         }
 
         // Initializes a Bluetooth adapter.  For API level 18 and above, get a reference to
@@ -72,26 +90,21 @@ public class DeviceScanActivity extends ListActivity {
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
-        
+
         // Checks if Bluetooth is supported on the device.
-        if (mBluetoothAdapter == null) {
-            Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-            finish();
-            return;
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(
+                    BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            this.startActivityForResult(enableBtIntent,
+                    REQUEST_ENABLE_BT);
         }
-        //开启蓝牙
-        mBluetoothAdapter.enable();
-        
+        SPUtiles.getInstance(this);
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        // Initializes list view adapter.
-        mLeDeviceListAdapter = new LeDeviceListAdapter(this);
-        setListAdapter(mLeDeviceListAdapter);
         scanLeDevice(true);
     }
 
@@ -99,47 +112,93 @@ public class DeviceScanActivity extends ListActivity {
     protected void onPause() {
         super.onPause();
         scanLeDevice(false);
-        mLeDeviceListAdapter.clear();
     }
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
-            // Stops scanning after a pre-defined scan period.
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScanning = false;
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    invalidateOptionsMenu();
-                }
-            }, SCAN_PERIOD);
-
-            mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
         } else {
-            mScanning = false;
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
-        invalidateOptionsMenu();
     }
 
     // Device scan callback.
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
-
-        @Override
-        public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-
-        	final iBeacon ibeacon = iBeaconClass.fromScanData(device,rssi,scanRecord);
-        	runOnUiThread(new Runnable() {
                 @Override
-                public void run() {
-                    mLeDeviceListAdapter.addDevice(ibeacon);
-                    mLeDeviceListAdapter.notifyDataSetChanged();
+                public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+
+                    final iBeacon ibeacon = iBeaconClass.fromScanData(device, rssi, scanRecord);
+                    if (ibeacon == null) {
+                        return;
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String filter_uuid = SPUtiles.getStringValue(BTConstants.SP_KEY_FILTER_UUID, "");
+                            String filter_minor = SPUtiles.getStringValue(BTConstants.SP_KEY_FILTER_MINOR, "");
+                            String filter_major = SPUtiles.getStringValue(BTConstants.SP_KEY_FILTER_MAJOR, "");
+                            if (!TextUtils.isEmpty(filter_uuid) &&
+                                    !TextUtils.isEmpty(filter_minor) &&
+                                    !TextUtils.isEmpty(filter_major)) {
+                                if (!filter_uuid.equals(ibeacon.proximityUuid) ||
+                                        !filter_minor.equals(ibeacon.minor + "") ||
+                                        !filter_major.equals(ibeacon.major + "")) {
+                                    return;
+                                }
+                            }
+                            tvUuid.setText(ibeacon.proximityUuid);
+                            tvMajor.setText(ibeacon.major + "");
+                            tvMinor.setText(ibeacon.minor + "");
+                            tvMac.setText(ibeacon.bluetoothAddress);
+                            tvRssi.setText(ibeacon.rssi + "");
+                            int nearest = SPUtiles.getIntValue(BTConstants.SP_KEY_RSSI_NEAREST, -40);
+                            int nearer = SPUtiles.getIntValue(BTConstants.SP_KEY_RSSI_NEARER, -70);
+                            int near = SPUtiles.getIntValue(BTConstants.SP_KEY_RSSI_NEAR, -100);
+                            int duration = SPUtiles.getIntValue(BTConstants.SP_KEY_RSSI_LEAVE_DURATION, 50);
+                            if (ibeacon.rssi > nearest && ibeacon.rssi < 0) {
+                                isReset = true;
+                                ivRssiStatus.setImageResource(R.drawable.nearest);
+                                ivRssiNearest.setImageResource(R.drawable.checked);
+                                ivRssiNearer.setImageResource(R.drawable.checked);
+                                ivRssiNear.setImageResource(R.drawable.checked);
+                            }
+                            if (ibeacon.rssi > nearer && ibeacon.rssi < nearest) {
+                                isReset = true;
+                                ivRssiStatus.setImageResource(R.drawable.nearer);
+                                ivRssiNearest.setImageResource(R.drawable.checked_no);
+                                ivRssiNearer.setImageResource(R.drawable.checked);
+                                ivRssiNear.setImageResource(R.drawable.checked);
+                            }
+                            if (ibeacon.rssi > near && ibeacon.rssi < nearer) {
+                                isReset = true;
+                                ivRssiStatus.setImageResource(R.drawable.near);
+                                ivRssiNearest.setImageResource(R.drawable.checked_no);
+                                ivRssiNearer.setImageResource(R.drawable.checked_no);
+                                ivRssiNear.setImageResource(R.drawable.checked);
+                            }
+                            if (ibeacon.rssi == 0 || ibeacon.rssi < near) {
+                                isReset = false;
+                                mHandler.sendEmptyMessageDelayed(0, duration * 1000);
+                            }
+                        }
+                    });
                 }
-            });
+            };
+    private Handler mHandler = new Handler() {
+
+        public void dispatchMessage(Message msg) {
+            if (0 == msg.what && !isReset) {
+                ivRssiStatus.setImageResource(R.drawable.away);
+                ivRssiNearest.setImageResource(R.drawable.checked_no);
+                ivRssiNearer.setImageResource(R.drawable.checked_no);
+                ivRssiNear.setImageResource(R.drawable.checked_no);
+            }
         }
     };
 
-
+    @OnClick(R.id.tv_left)
+    public void onClick() {
+        startActivity(new Intent(this, SettingActivity.class));
+    }
 }

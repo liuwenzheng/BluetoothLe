@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="primary_dark_color">#66009688</color>
+    <color name="primary_color">#ff009688</color>
+    <color name="secondary_color">#ff37474f</color>
+    <color name="blue_c3e4ed">#c3e4ed</color>
+    <color name="blue_17779d">#17779d</color>
+    <color name="blue_2ea6c9">#2ea6c9</color>
+    <color name="blue_97e5fb">#97e5fb</color>
+    <color name="blue_2eb7dd">#2eb7dd</color>
+    <color name="blue_40acaf">#40acaf</color>
+    <color name="blue_20bac0">#20bac0</color>
+    <color name="blue_b4efff">#b4efff</color>
+    <color name="blue_4dc1c6">#4dc1c6</color>
+    <color name="black_242424">#242424</color>
+    <color name="black_373737">#373737</color>
+    <color name="black_484848">#484848</color>
+    <color name="white_fdfdfd">#fdfdfd</color>
+    <color name="grey_f2f2f2">#f2f2f2</color>
+    <color name="grey_ababab">#ababab</color>
+    <color name="grey_b6b6b6">#b6b6b6</color>
+    <color name="grey_3a3a3a">#3a3a3a</color>
+    <color name="grey_323232">#323232</color>
+    <color name="grey_2b2b2b">#2b2b2b</color>
+    <color name="grey_f4f4f4">#f4f4f4</color>
+    <color name="grey_545454">#545454</color>
+    <color name="grey_d5d5d5">#d5d5d5</color>
+    <color name="grey_dddddd">#dddddd</color>
+    <color name="grey_8b8b8b">#8b8b8b</color>
+    <color name="grey_979797">#979797</color>
+    <color name="grey_d9d9d9">#d9d9d9</color>
+    <color name="grey_b4b4b4">#b4b4b4</color>
+    <color name="grey_696969">#696969</color>
+    <color name="grey_f0f0f0">#f0f0f0</color>
+    <color name="grey_acacac">#acacac</color>
+    <color name="grey_efefef">#efefef</color>
+    <color name="grey_ebebef">#ebebef</color>
+    <color name="red_ec4300">#ec4300</color>
+    <color name="red_e05b5e">#e05b5e</color>
+    <color name="red_d75c70">#d75c70</color>
+
+    <!-- test -->
+    <color name="black_000000">#000000</color>
+    <color name="black">#000000</color>
+    <color name="white_ffffff">#ffffff</color>
+    <color name="grey_7a7a7a">#7a7a7a</color>
+    <color name="red_FF4400">#FF4400</color>
+    <color name="bg_FEF9F5">#FEF9F5</color>
+    <color name="black_333333">#333333</color>
+    <color name="grey_d1cfd0">#d1cfd0</color>
+    <color name="grey_999999">#999999</color>
+    <color name="grey_666666">#666666</color>
+    <color name="half_transparent">#99000000</color>
+    <color name="grey_f3f3f3">#f3f3f3</color>
+    <color name="grey_fafafa">#fafafa</color>
+    <color name="navigate_backgroud">#FFFFFF</color>
+    <!-- chart -->
+    <color name="axis">#4dc1c6</color>
+    <color name="grid">#b0bec5</color>
+    <color name="text_view">#455a64</color>
+    <color name="button_pressed">#607d8b</color>
+    <color name="button_disabled">#b0bec5</color>
+    <color name="button_default">#37474f</color>
+    <color name="app_background">#e0e0e0</color>
+    <color name="actionbar">#607d8b</color>
+
+</resources>
