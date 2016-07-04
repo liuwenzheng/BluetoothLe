@@ -50,7 +50,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="-40"
+            android:text=""
             android:textSize="20sp" />
     </LinearLayout>
     <LinearLayout
@@ -71,7 +71,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="-70"
+            android:text=""
             android:textSize="20sp" />
     </LinearLayout>
     <LinearLayout
@@ -92,7 +92,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="-100"
+            android:text=""
             android:textSize="20sp" />
     </LinearLayout>
     <LinearLayout
@@ -113,7 +113,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
-            android:text="50"
+            android:text=""
             android:textSize="20sp" />
         <TextView
             android:layout_width="wrap_content"

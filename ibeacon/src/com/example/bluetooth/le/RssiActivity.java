@@ -29,6 +29,10 @@ public class RssiActivity extends Activity {
         setContentView(R.layout.activity_rssi);
         ButterKnife.bind(this);
         SPUtiles.getInstance(this);
+        etNearest.setText(SPUtiles.getIntValue(BTConstants.SP_KEY_RSSI_NEAREST, -40));
+        etNearer.setText(SPUtiles.getIntValue(BTConstants.SP_KEY_RSSI_NEARER, -70));
+        etNear.setText(SPUtiles.getIntValue(BTConstants.SP_KEY_RSSI_NEAR, -100));
+        etLeavetime.setText(SPUtiles.getIntValue(BTConstants.SP_KEY_RSSI_LEAVE_DURATION, 50));
     }
 
     @OnClick(R.id.tv_left)

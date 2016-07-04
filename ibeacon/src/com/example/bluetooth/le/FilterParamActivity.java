@@ -32,6 +32,9 @@ public class FilterParamActivity extends Activity {
         setContentView(R.layout.activity_filter_param);
         ButterKnife.bind(this);
         SPUtiles.getInstance(this);
+        etUuid.setText(SPUtiles.getStringValue(BTConstants.SP_KEY_FILTER_UUID, ""));
+        etMajor.setText(SPUtiles.getStringValue(BTConstants.SP_KEY_FILTER_MAJOR, ""));
+        etMinor.setText(SPUtiles.getStringValue(BTConstants.SP_KEY_FILTER_MINOR, ""));
     }
 
     @OnClick({R.id.tv_left, R.id.tv_right})
