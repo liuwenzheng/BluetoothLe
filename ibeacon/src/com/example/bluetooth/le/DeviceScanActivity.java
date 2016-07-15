@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -197,8 +198,17 @@ public class DeviceScanActivity extends Activity {
         }
     };
 
-    @OnClick(R.id.tv_left)
-    public void onClick() {
-        startActivity(new Intent(this, SettingActivity.class));
+    @OnClick({R.id.tv_left, R.id.tv_right})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.tv_left:
+                startActivity(new Intent(this, SettingActivity.class));
+                break;
+            case R.id.tv_right:
+                startActivity(new Intent(this, DevicesActivity.class));
+                break;
+        }
     }
+
+
 }

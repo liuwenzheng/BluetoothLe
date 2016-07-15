@@ -2,6 +2,8 @@ package com.example.bluetooth.le;
 
 import android.bluetooth.BluetoothDevice;
 
+import java.util.Comparator;
+
 /**
  * 代码改自https://github.com/RadiusNetworks/android-ibeacon-service/blob/master/src/main/java/com/radiusnetworks/ibeacon/IBeacon.java
  * @author gvzhang
@@ -9,7 +11,7 @@ import android.bluetooth.BluetoothDevice;
  */
 public class iBeaconClass {
 
-    static public  class iBeacon{
+    static public  class iBeacon implements Comparable<iBeacon>{
     	public String name;
     	public int major;
     	public int minor;
@@ -17,7 +19,17 @@ public class iBeaconClass {
     	public String bluetoothAddress;
     	public int txPower;
     	public int rssi;
-    }
+
+		@Override
+		public int compareTo(iBeacon another) {
+			if (this.rssi > another.rssi) {
+				return -1;
+			} else if (this.rssi < another.rssi) {
+				return 1;
+			}
+			return 0;
+		}
+	}
     public static iBeacon fromScanData(BluetoothDevice device, int rssi,byte[] scanData) {
 
     	int startByte = 2;
