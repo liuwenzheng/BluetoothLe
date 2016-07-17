@@ -12,11 +12,11 @@ import android.os.Handler;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +34,7 @@ public class DevicesActivity extends Activity {
     private DeviceAdapter mAdapter;
     private ProgressDialog mDialog;
     public static Handler mHandler;
+    public static final int SCAN_PERIOD = 15000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,11 @@ public class DevicesActivity extends Activity {
         mAdapter.setOnItemClickLitener(new OnItemClickLitener() {
             @Override
             public void onItemClick(View view, int position) {
-                // TODO: 2016/7/15 连接设备并跳转
+                // 跳转配置
+                iBeaconClass.iBeacon iBeacon = mDatas.get(position);
+                Intent intent = new Intent(DevicesActivity.this, ParamSettingActivity.class);
+                intent.putExtra("ibeacon", iBeacon);
+                startActivity(intent);
             }
         });
         final BluetoothManager bluetoothManager =
@@ -63,23 +68,20 @@ public class DevicesActivity extends Activity {
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
-            mDialog = ProgressDialog.show(this, null,"正在搜索iBeacon设备", false, false);
+            mDatas.clear();
+            mDialog = ProgressDialog.show(this, null, "正在搜索iBeacon设备", false, false);
             mBluetoothAdapter.startLeScan(mLeScanCallback);
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if (mIsStartScan) {
-                        LogModule.i(SCAN_PERIOD / 1000 + "s后停止扫描");
-                        BTModule.mBluetoothAdapter.stopLeScan(BTService.this);
-                        mIsStartScan = false;
-                        Intent intent = new Intent(
-                                BTConstants.ACTION_BLE_DEVICES_DATA_END);
-                        // intent.putExtra("devices", mDevices);
-                        sendBroadcast(intent);
-                    }
+                    Toast.makeText(DevicesActivity.this, SCAN_PERIOD / 1000 + "s后停止扫描", Toast.LENGTH_SHORT).show();
+                    scanLeDevice(false);
                 }
             }, SCAN_PERIOD);
         } else {
+            if (mDialog != null) {
+                mDialog.dismiss();
+            }
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
         }
     }
@@ -118,8 +120,10 @@ public class DevicesActivity extends Activity {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_left:
+                finish();
                 break;
             case R.id.tv_right:
+                scanLeDevice(true);
                 break;
         }
     }
